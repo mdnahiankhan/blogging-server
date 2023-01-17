@@ -27,10 +27,33 @@ async function run() {
             res.send(blogs);
         })
 
+        app.get('/blogs/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const user = await blogcollection.findOne(query);
+            res.send(user);
+        })
+
         app.post('/blogs', async (req, res) => {
             const blogs = req.body;
             const result = await blogcollection.insertOne(blogs);
             res.send(result)
+        })
+
+        app.put('/blogs/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const blog = req.body;
+            const option = { upsert: true };
+            const updatedBlog = {
+                $set: {
+                    name: blog.name,
+                    email: blog.email,
+                    texts: blog.texts
+                }
+            }
+            const result = await blogcollection.updateOne(filter, updatedBlog, option);
+            res.send(result);
         })
 
         app.delete('/blogs/:id', async (req, res) => {
